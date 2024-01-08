@@ -11,12 +11,13 @@ export default class BaseTower extends TowerParent {
   }
 
   update(time, delta, target) {
+    console.log()
     this.projectiles.forEach((element) => {
       if (element === undefined) return;
 
       this.moveProjectileTwordsTarget(element);
 
-      element.lerpStep += delta / 300;
+      element.lerpStep += delta / 500;
     });
   }
 
