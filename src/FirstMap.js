@@ -2,6 +2,7 @@ import Phaser from "phaser";
 
 import BaseMinnion from "./Classes/BaseMinnion";
 import BaseTower from "./Classes/BaseTower";
+import TowerPlace from "./Classes/TowerPlace";
 
 export default class HelloWorldScene extends Phaser.Scene {
   constructor() {
@@ -14,6 +15,9 @@ export default class HelloWorldScene extends Phaser.Scene {
   minnion;
   minnions = [];
   minnionCount = [];
+
+  towerPlace;
+  towerPlaces = [];
 
   startWaveButton;
 
@@ -30,49 +34,53 @@ export default class HelloWorldScene extends Phaser.Scene {
   minnionReward = 5;
 
   preload() {
-    this.load.image("map", "assets/map.png");
-    this.load.image("TowerPicker", "assets/TowerPicker.png");
-    this.load.image("TowerDraggable", "assets/TowerDraggable.png");
-    this.load.image(
-      "TowerDraggableShooting",
-      "assets/TowerDraggableShooting.png"
+    this.load.baseURL = "assets/";
+
+    this.load.image("map", "map.png");
+    this.load.image("map2", "map2.png");
+    this.load.image("map3", "map3.png");
+    this.load.image("Minnion", "Minnion.png");
+    this.load.image("StartWaveButton", "StartWaveButton.png");
+    this.load.image("ElectricTowerBase", "ElectricTowerBase.png");
+    this.load.image("TowerElectric", "TowerElectric.png");
+    this.load.image("UIBG", "UIBG.png");
+    this.load.image("Zombie", "Zombie.png");
+    this.load.image("Projectile", "Lighter.png");
+
+    this.load.atlas(
+      "ATowerElectric",
+      "TowerElectricAtlas.png",
+      "TowerElectricAtlas.json"
     );
-    this.load.image("Minnion", "assets/Minnion.png");
-    this.load.image("StartWaveButton", "assets/StartWaveButton.png");
   }
 
   create() {
-    this.add.image(0, 0, "map").setOrigin(0, 0);
+    this.add.image(0, 0, "map2").setOrigin(0, 0);
 
-    this.towerGroup = this.add.group();
-    this.minnionGroup = this.add.group();
-
-    this.createDraggableTowerButton();
-
-    this.handleInputs();
+    this.createTowerPlaces();
 
     this.createPath();
 
+    this.add.image(540, 1944, "UIBG");
+
     this.createStartWaveButton();
 
-    this.balanceText = this.add.text(80, 2620, `BALANCE: \n${this.balance}`, {
-      fontSize: "60px",
-      strokeThickness: 5,
-    });
-
-    this.towerCostText = this.add.text(550, 2520, `Cost: ${this.towerCost}`, {
-      fontSize: "60px",
-      strokeThickness: 5,
-    });
+    this.handleInputs();
   }
 
   update(time, delta) {
-    this.rotateTowers();
+    this.towers.forEach((element) => {
+      element.update(time, delta, this.startWaveButton);
+    });
 
-    if (this.state === 1) {
-      this.checkIfMinnionsFinished();
-      this.checkIfTowersFinished();
-    }
+  }
+
+  populateTowersArray() {
+    this.towerPlaces.forEach(element => {
+      if (element.tower === undefined) return
+
+      this.towers.push(element.tower);
+    });
   }
 
   checkIfMinnionsFinished() {
@@ -123,6 +131,44 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.towers = [];
   }
 
+  createTowerPlaces() {
+    this.createTowerPlace(972, 64);
+
+    this.createTowerPlace(972, 280);
+
+    this.createTowerPlace(972, 496);
+
+    this.createTowerPlace(540, 280);
+
+    this.createTowerPlace(324, 280);
+
+    this.createTowerPlace(108, 496);
+
+    this.createTowerPlace(108, 712);
+
+    this.createTowerPlace(108, 1114);
+
+    this.createTowerPlace(108, 1360);
+
+    this.createTowerPlace(540, 712);
+
+    this.createTowerPlace(540, 928);
+
+    this.createTowerPlace(540, 1114);
+
+    this.createTowerPlace(754, 1114);
+
+    this.createTowerPlace(324, 1574);
+
+    this.createTowerPlace(756, 1574);
+  }
+
+  createTowerPlace(x, y) {
+    this.towerPlace = new TowerPlace(this, x, y, "ElectricTowerBase");
+    this.add.existing(this.towerPlace);
+    this.towerPlaces.push(this.towerPlace);
+  }
+
   createDraggableTowerButton() {
     this.towerButton = this.add.image(704, 2700, "TowerPicker").setScale(2, 2);
     this.towerButton.setInteractive();
@@ -138,7 +184,7 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   createStartWaveButton() {
-    this.startWaveButton = this.add.image(1200, 2690, "StartWaveButton");
+    this.startWaveButton = this.add.image(900, 2000, "StartWaveButton");
     this.startWaveButton.setInteractive();
 
     this.startWaveButton.on("pointerdown", () => {
@@ -152,6 +198,8 @@ export default class HelloWorldScene extends Phaser.Scene {
 
     this.startWaveButton.setAlpha(0);
 
+    this.populateTowersArray();
+
     this.setMinnionTargetsToTowers();
 
     this.state = 1;
@@ -162,53 +210,22 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   handleInputs() {
-    this.input.on("pointerup", (pointer, gameObject) => {
-      if (!this.canDragTower) return;
-
-      this.canDragTower = false;
-      this.draggableTower.destroy();
-
-      this.createTower(pointer.x, pointer.y);
-      this.balance -= this.towerCost;
-      this.balanceText.text = `BALANCE: \n${this.balance}`;
-    });
+    this.input.on("pointerup", (pointer, gameObject) => {});
 
     this.input.on("pointerdown", (pointer) => {});
 
-    this.input.on("pointermove", () => {
-      if (this.canDragTower) {
-        this.draggableTower.x = this.input.x;
-        this.draggableTower.y = this.input.y;
-      }
-    });
-  }
-
-  createTower(x, y) {
-    this.tower = new BaseTower(this, x, y, "TowerDraggable");
-    this.add.existing(this.tower);
-    this.towers.push(this.tower);
-  }
-
-  rotateTowers() {
-    if (this.state === 1) {
-      for (let i = 0; i < this.towers.length; i++) {
-        this.towers[i].rotateTower(this.minnions[0]);
-      }
-    }
+    this.input.on("pointermove", () => {});
   }
 
   createPath() {
     this.graphics = this.add.graphics();
     this.graphics.lineStyle(10, 0xffffff, 1);
 
-    this.path = new Phaser.Curves.Path(-40, 400);
-    this.path.lineTo(500, 400);
-    this.path.lineTo(500, 1000);
-    this.path.lineTo(1000, 1000);
-    this.path.lineTo(1000, 1660);
-    this.path.lineTo(652, 1660);
-    this.path.lineTo(652, 2000);
-    this.path.lineTo(-40, 2000);
+    this.path = new Phaser.Curves.Path(756, -64);
+    this.path.lineTo(762, 550);
+    this.path.lineTo(330, 550);
+    this.path.lineTo(330, 1414);
+    this.path.lineTo(1144, 1414);
 
     this.path.draw(this.graphics);
   }
@@ -216,14 +233,7 @@ export default class HelloWorldScene extends Phaser.Scene {
   spawnMinnions(minnionCount) {
     for (let i = 0; i < minnionCount; i++) {
       this.minnionCount.push(1);
-      this.minnion = new BaseMinnion(
-        this,
-        this.path,
-        -40,
-        400,
-        "Minnion",
-        8000
-      );
+      this.minnion = new BaseMinnion(this, this.path, 756, -64, "Zombie", 8000);
 
       this.add.existing(this.minnion);
       this.minnions.push(this.minnion);
