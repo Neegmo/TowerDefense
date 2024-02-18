@@ -3,7 +3,6 @@ import Phaser from 'phaser'
 import HelloWorldScene from './HelloWorldScene'
 import FirstMap from './FirstMap'
 
-var minnionCount
 
 const config = {
 	type: Phaser.AUTO,

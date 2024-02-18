@@ -14,6 +14,9 @@ export default class TowerParent extends Phaser.GameObjects.Image {
     this.on("pointerup", () => {
       this.destroy();
       this.ammoText.destroy();
+      scene.numberOfTowers--;
+      scene.totalBetText.text = `${scene.bet*scene.numberOfTowers}`
+      scene.chanceToWinText.text = `${scene.winChanceSequence[scene.numberOfTowers]}`
     })
   }
 
@@ -22,12 +25,12 @@ export default class TowerParent extends Phaser.GameObjects.Image {
 
   generateAmmoText() {
     this.ammoText = this.scene.add.text(
-      this.x - 50,
-      this.y - 150,
+      this.x - 52,
+      this.y + 15,
       `${this.ammo}`,
       {
-        fontSize: "70px",
-        strokeThickness: 7,
+        fontSize: "50px",
+        strokeThickness: 4,
       }
     );
   }

@@ -3,15 +3,15 @@ import TowerParent from "./TowerParent";
 export default class BaseTower extends TowerParent {
   projectile;
   projectiles = [];
-
+  scene;
   constructor(scene, x, y, texture) {
     super(scene, x, y, texture, 5);
-
+    this.scene = scene;
     scene.input.on("pointerdown", () => {});
   }
 
   update(time, delta, target) {
-    console.log()
+    console.log();
     this.projectiles.forEach((element) => {
       if (element === undefined) return;
 
@@ -21,7 +21,7 @@ export default class BaseTower extends TowerParent {
     });
   }
 
-  shootMinnion(target, iteration, minnionCount, scene) {
+  shootMinnion(target, iteration, scene) {
     for (let i = 0; i < this.amountOfBullets; i++) {
       var delay = i * 1000 + iteration * 3000;
       scene.time.delayedCall(1000 + delay, () => {
@@ -29,9 +29,6 @@ export default class BaseTower extends TowerParent {
         if (target[index] !== undefined) {
           this.createProjectile(target[index]);
 
-          // target[index].destroy();
-          // target[index].isDead = true;
-          // minnionCount.shift();
 
           this.updateAmmoText();
         }
@@ -40,24 +37,23 @@ export default class BaseTower extends TowerParent {
   }
 
   createProjectile(target) {
-    console.log("createProjectile called");
-    console.log(target);
     this.projectile = {
       gameObject: this.scene.add.sprite(this.x, this.y - 100, "Projectile"),
+
       startX: this.x,
       startY: this.y - 100,
       target: target,
       lerpStep: 0,
+      isFinished: false,
     };
 
     this.projectiles.push(this.projectile);
   }
 
   moveProjectileTwordsTarget(projectile) {
+    if (projectile.isFinished) return;
     if (projectile.lerpStep >= 1) {
-      projectile.gameObject.destroy();
-      projectile.target.destroy();
-      projectile.target.isDead = true;
+      this.projectileReachedTheTarget(projectile);
     }
     projectile.gameObject.x = this.lerp(
       projectile.startX,
@@ -69,6 +65,16 @@ export default class BaseTower extends TowerParent {
       projectile.target.y,
       projectile.lerpStep
     );
+  }
+
+  projectileReachedTheTarget(projectile) {
+    projectile.gameObject.destroy();
+    projectile.target.stopFollow();
+    projectile.target.destroy();
+    projectile.target.isDead = true;
+    this.scene.minnionCount.pop();
+    projectile.isFinished = true;
+    if(this.scene.minnionCount.length < 1) this.scene.finishWave(true);
   }
 
   lerp(start, end, amt) {

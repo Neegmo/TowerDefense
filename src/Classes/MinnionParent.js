@@ -2,6 +2,7 @@ export default class MinnionParent extends Phaser.GameObjects.PathFollower {
   walkingSpeed;
   isDead;
   isWalking;
+  scene
 
   constructor(scene, path, x, y, texture, speed) {
     super(scene, path, x, y, texture);
@@ -9,6 +10,7 @@ export default class MinnionParent extends Phaser.GameObjects.PathFollower {
     this.walkingSpeed = speed;
     this.isDead = false;
     this.isWalking = false;
+    this.scene = scene
   }
 
   startWalking(iteration) {
@@ -19,6 +21,9 @@ export default class MinnionParent extends Phaser.GameObjects.PathFollower {
           duration: this.walkingSpeed,
           rotateToPath: false,
           repeat: 0,
+          onComplete: () => {
+            this.scene.finishWave(false);
+          },
         });
         this.isWalking = true;
       }

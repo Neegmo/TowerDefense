@@ -33,29 +33,67 @@ export default class HelloWorldScene extends Phaser.Scene {
 
   minnionReward = 5;
 
+  bet = 10;
+  betText;
+  totalBetText;
+  IncreaseBetBtn;
+  DecreaseBetBtn;
+
+  winChanceSequence = [
+    "0%",
+    "5.88%",
+    "11.76%",
+    "17.65%",
+    "23.53%",
+    "29.41%",
+    "35.29%",
+    "41.18%",
+    "47.06%",
+    "52.94%",
+    "58.82%",
+    "64.71%",
+    "70.59%",
+    "76.47%",
+    "82.35%",
+    "88.24%",
+  ];
+
+  totalWinText;
+  chanceToWinText;
+
+  chest;
+
+  numberOfTowers = 0;
+
   preload() {
     this.load.baseURL = "assets/";
 
-    this.load.image("map", "map.png");
-    this.load.image("map2", "map2.png");
-    this.load.image("map3", "map3.png");
-    this.load.image("Minnion", "Minnion.png");
-    this.load.image("StartWaveButton", "StartWaveButton.png");
-    this.load.image("ElectricTowerBase", "ElectricTowerBase.png");
-    this.load.image("TowerElectric", "TowerElectric.png");
-    this.load.image("UIBG", "UIBG.png");
+    this.load.image("map", "BGV2.png");
+    this.load.image("StartWaveButton", "StartWaveButtonV2.png");
+    this.load.image("ElectricTowerBase", "TowerPlace.png");
+    this.load.image("TowerElectric", "TowerElectricV2.png");
+    this.load.image("UIBG", "UIPanelV2.png");
     this.load.image("Zombie", "Zombie.png");
     this.load.image("Projectile", "Lighter.png");
+    this.load.image("Chest", "Chest.png");
+    this.load.image("IncreaseBetBtn", "IncreaseBetBtn.png");
+    this.load.image("DecreaseBetBtn", "DecreaseBetBtn.png");
+    this.load.image("Panel", "Panel.png");
+    this.load.image("ZombieHead", "ZombieHead.png");
+    this.load.image("Coin", "Coin.png");
+    this.load.image("Heart", "Heart.png");
 
-    this.load.atlas(
-      "ATowerElectric",
-      "TowerElectricAtlas.png",
-      "TowerElectricAtlas.json"
-    );
+    // this.load.atlas(
+    //   "ATowerElectric",
+    //   "TowerElectricAtlas.png",
+    //   "TowerElectricAtlas.json"
+    // );
   }
 
   create() {
-    this.add.image(0, 0, "map2").setOrigin(0, 0);
+    this.resetVariables();
+
+    this.add.image(0, 0, "map").setOrigin(0, 0);
 
     this.createTowerPlaces();
 
@@ -66,6 +104,19 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.createStartWaveButton();
 
     this.handleInputs();
+
+    this.createChest();
+
+    this.createBetText();
+    this.createChangeBetButtons();
+
+    this.createTotalBetText();
+
+    this.createHUD();
+
+    this.createBalanceText();
+
+    
   }
 
   update(time, delta) {
@@ -73,30 +124,100 @@ export default class HelloWorldScene extends Phaser.Scene {
       element.update(time, delta, this.startWaveButton);
     });
 
+    console.log(this.minnionCount.length)
+  }
+
+  createBalanceText() {
+    this.balanceText = this.add.text(
+      250,
+      2050,
+      `${this.balance}`,
+      {
+        fontSize: "60px",
+        strokeThickness: 7,
+      }
+    );
+  }
+
+  createHUD() {
+    this.add.image(200, 100, "Panel").setDepth(90);
+    this.add.text(190, 75, "1-85", {
+      fontSize: "40px",
+      strokeThickness: 5,
+    }).setDepth(91);
+    this.add.image(90, 100, "ZombieHead").setScale(0.8, 0.8).setDepth(92);
+
+    this.add.image(550, 100, "Panel").setDepth(90);
+    this.chanceToWinText = this.add.text(
+      515,
+      75,
+      `${this.winChanceSequence[0]}`,
+      {
+        fontSize: "40px",
+        strokeThickness: 5,
+      }
+    ).setDepth(91);
+    this.add.image(440, 100, "Heart").setScale(0.7, 0.7).setDepth(92);
+
+    this.add.image(900, 100, "Panel").setDepth(90);
+    this.totalWinText = this.add.text(890, 75, "160", {
+      fontSize: "40px",
+      strokeThickness: 5,
+    }).setDepth(91);
+    this.add.image(790, 100, "Coin").setScale(0.8, 0.8).setDepth(92);
+  }
+
+  createTotalBetText() {
+    this.totalBetText = this.add.text(
+      750,
+      1885,
+      `${this.bet * this.numberOfTowers}`,
+      {
+        fontSize: "60px",
+        strokeThickness: 7,
+      }
+    );
+  }
+
+  createBetText() {
+    this.betText = this.add.text(285, 1885, `${this.bet}`, {
+      fontSize: "60px",
+      strokeThickness: 7,
+    });
+  }
+
+  createChangeBetButtons() {
+    this.IncreaseBetBtn = this.add
+      .image(440, 1920, "IncreaseBetBtn")
+      .setInteractive();
+    this.IncreaseBetBtn.on("pointerdown", () => {
+      this.bet += 10;
+      this.betText.text = `${this.bet}`;
+      this.totalBetText.text = `${this.bet * this.numberOfTowers}`;
+      this.totalWinText.text = `${this.bet * 16}`;
+    });
+
+    this.DecreaseBetBtn = this.add
+      .image(190, 1920, "DecreaseBetBtn")
+      .setInteractive();
+    this.DecreaseBetBtn.on("pointerdown", () => {
+      this.bet -= 10;
+      this.betText.text = `${this.bet}`;
+      this.totalBetText.text = `${this.bet * this.numberOfTowers}`;
+      this.totalWinText.text = `${this.bet * 16}`;
+    });
+  }
+
+  createChest() {
+    this.chest = this.add.sprite(980, 1400, "Chest").setScale(0.6, 0.6);
   }
 
   populateTowersArray() {
-    this.towerPlaces.forEach(element => {
-      if (element.tower === undefined) return
+    this.towerPlaces.forEach((element) => {
+      if (element.tower === undefined) return;
 
       this.towers.push(element.tower);
     });
-  }
-
-  checkIfMinnionsFinished() {
-    this.minnions.forEach((element) => {
-      if (!element.isDead && element.isWalking) {
-        if (element.pathTween.getValue() === 1) {
-          this.finishWave(false);
-        }
-      }
-    });
-  }
-
-  checkIfTowersFinished() {
-    if (this.minnionCount.length === 0) {
-      this.finishWave(true);
-    }
   }
 
   finishWave(succesful) {
@@ -104,27 +225,34 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.startWaveButton.setAlpha(1);
     this.resetMinnionArray();
     this.resetTowerArray();
+    this.numberOfTowers = 0;
 
     if (succesful) {
-      this.balance += this.minnionReward * this.ammountOfMinnions;
-      this.balanceText.text = `BALANCE: \n${this.balance}`;
+      this.balance += this.bet * 16;
+      this.balanceText.text = `${this.balance}`;
     }
+
+    this.scene.restart();
   }
 
   resetMinnionArray() {
     for (let i = 0; i < this.minnions.length; i++) {
       if (this.minnions[i] !== undefined) {
+        this.minnions[i].stopFollow();
         this.minnions[i].destroy();
         this.minnions[i].isDead = true;
       }
     }
     this.minnions = [];
+    this.minnionCount = [];
   }
 
   resetTowerArray() {
     for (let i = 0; i < this.towers.length; i++) {
       if (this.towers[i] !== undefined) {
+        this.towers[i].projectiles = [];
         this.towers[i].destroy();
+        this.towers[i].ammoText.destroy();
         this.towers[i].isDestroyed = true;
       }
     }
@@ -132,35 +260,35 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   createTowerPlaces() {
-    this.createTowerPlace(972, 64);
+    this.createTowerPlace(588, 315);
 
-    this.createTowerPlace(972, 280);
+    this.createTowerPlace(955, 430);
 
-    this.createTowerPlace(972, 496);
+    this.createTowerPlace(935, 675);
 
-    this.createTowerPlace(540, 280);
+    this.createTowerPlace(740, 800);
 
-    this.createTowerPlace(324, 280);
+    this.createTowerPlace(445, 465);
 
-    this.createTowerPlace(108, 496);
+    this.createTowerPlace(250, 600);
 
-    this.createTowerPlace(108, 712);
+    this.createTowerPlace(245, 870);
 
-    this.createTowerPlace(108, 1114);
+    this.createTowerPlace(600, 965);
 
-    this.createTowerPlace(108, 1360);
+    this.createTowerPlace(175, 1125);
 
-    this.createTowerPlace(540, 712);
+    this.createTowerPlace(645, 1230);
 
-    this.createTowerPlace(540, 928);
+    this.createTowerPlace(225, 1385);
 
-    this.createTowerPlace(540, 1114);
+    this.createTowerPlace(415, 1565);
 
-    this.createTowerPlace(754, 1114);
+    this.createTowerPlace(615, 1565);
 
-    this.createTowerPlace(324, 1574);
+    this.createTowerPlace(815, 1565);
 
-    this.createTowerPlace(756, 1574);
+    this.createTowerPlace(900, 1230);
   }
 
   createTowerPlace(x, y) {
@@ -169,22 +297,8 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.towerPlaces.push(this.towerPlace);
   }
 
-  createDraggableTowerButton() {
-    this.towerButton = this.add.image(704, 2700, "TowerPicker").setScale(2, 2);
-    this.towerButton.setInteractive();
-    this.towerButton.on("pointerdown", (pointer, gameObject) => {
-      if (this.state === 0) {
-        this.draggableTower = this.add
-          .image(pointer.x, pointer.y, "TowerDraggable")
-          .setScale(2, 2);
-        this.draggableTower.setAlpha(0.7);
-        this.canDragTower = true;
-      }
-    });
-  }
-
   createStartWaveButton() {
-    this.startWaveButton = this.add.image(900, 2000, "StartWaveButton");
+    this.startWaveButton = this.add.image(780, 2070, "StartWaveButton");
     this.startWaveButton.setInteractive();
 
     this.startWaveButton.on("pointerdown", () => {
@@ -203,10 +317,12 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.setMinnionTargetsToTowers();
 
     this.state = 1;
+    this.balance -= this.bet * this.numberOfTowers
+    this.balanceText.text = `${this.balance}`
   }
 
   randomizeAmountOfMinnions() {
-    this.ammountOfMinnions = Phaser.Math.Between(1, 30);
+    this.ammountOfMinnions = Phaser.Math.Between(1, 85);
   }
 
   handleInputs() {
@@ -221,11 +337,11 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.graphics = this.add.graphics();
     this.graphics.lineStyle(10, 0xffffff, 1);
 
-    this.path = new Phaser.Curves.Path(756, -64);
-    this.path.lineTo(762, 550);
-    this.path.lineTo(330, 550);
-    this.path.lineTo(330, 1414);
-    this.path.lineTo(1144, 1414);
+    this.path = new Phaser.Curves.Path(762, -64);
+    this.path.lineTo(762, 650);
+    this.path.lineTo(425, 650);
+    this.path.lineTo(425, 1400);
+    this.path.lineTo(950, 1400);
 
     this.path.draw(this.graphics);
   }
@@ -245,7 +361,17 @@ export default class HelloWorldScene extends Phaser.Scene {
 
   setMinnionTargetsToTowers() {
     for (let i = 0; i < this.towers.length; i++) {
-      this.towers[i].shootMinnion(this.minnions, i, this.minnionCount, this);
+      this.towers[i].shootMinnion(this.minnions, i, this);
     }
   }
+
+resetVariables() {
+  this.towers = [];
+  this.minnions = [];
+  this.minnionCount = [];
+  this.towerPlaces = [];
+  this.state = 0;
+  this.ammountOfMinnions = 10;
+  this.towerCost = 15;
+}
 }

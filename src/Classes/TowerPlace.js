@@ -14,6 +14,9 @@ export default class TowerPlace extends Phaser.GameObjects.Image {
         this.tower = new BaseTower(this.scene, this.x, this.y - 64, "TowerElectric");
         this.scene.add.existing(this.tower);
         this.tower.generateAmmoText();
+        scene.numberOfTowers++;
+        scene.totalBetText.text = `${scene.bet*scene.numberOfTowers}`
+        scene.chanceToWinText.text = `${scene.winChanceSequence[scene.numberOfTowers]}`
       })
     }
   
