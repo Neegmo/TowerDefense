@@ -376,7 +376,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.path.lineTo(425, 1400);
     this.path.lineTo(950, 1400);
 
-    this.path.draw(this.graphics);
+    // this.path.draw(this.graphics);
   }
 
   spawnMinnions(minnionCount) {
