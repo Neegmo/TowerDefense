@@ -95,6 +95,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.load.image("ZombieHead", "ZombieHead.png");
     this.load.image("Coin", "Coin.png");
     this.load.image("Heart", "Heart.png");
+    this.load.image("ResetTowersButton", "ResetTowersButton.png");
 
     // this.load.atlas(
     //   "ATowerElectric",
@@ -129,7 +130,7 @@ export default class HelloWorldScene extends Phaser.Scene {
 
     this.createBalanceText();
 
-    this.resetWaveButton = this.add.image(980, 1600, "Coin").setScale(0.8, 0.8);
+    this.resetWaveButton = this.add.image(980, 1600, "ResetTowersButton").setScale(3, 3);
     this.resetWaveButton.setInteractive();
     this.resetWaveButton.on("pointerup", () => {
       for (let i = 0; i < this.populatedTowerPlaces.length; i++) {
