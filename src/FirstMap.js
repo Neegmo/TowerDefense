@@ -18,6 +18,7 @@ export default class HelloWorldScene extends Phaser.Scene {
 
   towerPlace;
   towerPlaces = [];
+  populatedTowerPlaces = [];
 
   startWaveButton;
 
@@ -58,6 +59,16 @@ export default class HelloWorldScene extends Phaser.Scene {
     "88.24%",
   ];
 
+  aditionalCoinsSequence = [
+    0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+    3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+    3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5,
+    5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6,
+    6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8,
+    8, 8, 8, 8, 8, 8, 9, 10, 12, 13, 14, 15, 15, 15, 15, 15, 15, 15, 16, 16, 16,
+    16, 16, 17, 18, 19, 20, 30, 50, 60, 100, 160,
+  ];
+
   totalWinText;
   chanceToWinText;
 
@@ -66,6 +77,8 @@ export default class HelloWorldScene extends Phaser.Scene {
   numberOfTowers = 0;
 
   preload() {
+    this.loadFont("troika", "assets/troika.otf");
+
     this.load.baseURL = "assets/";
 
     this.load.image("map", "BGV2.png");
@@ -116,7 +129,13 @@ export default class HelloWorldScene extends Phaser.Scene {
 
     this.createBalanceText();
 
-    
+    this.resetWaveButton = this.add.image(980, 1600, "Coin").setScale(0.8, 0.8);
+    this.resetWaveButton.setInteractive();
+    this.resetWaveButton.on("pointerup", () => {
+      for (let i = 0; i < this.populatedTowerPlaces.length; i++) {
+        if (this.populatedTowerPlaces[i] === 1) this.towerPlaces[i].addTower();
+      }
+    });
   }
 
   update(time, delta) {
@@ -124,47 +143,52 @@ export default class HelloWorldScene extends Phaser.Scene {
       element.update(time, delta, this.startWaveButton);
     });
 
-    console.log(this.minnionCount.length)
+    console.log(this.minnionCount.length);
   }
 
   createBalanceText() {
-    this.balanceText = this.add.text(
-      250,
-      2050,
-      `${this.balance}`,
-      {
-        fontSize: "60px",
-        strokeThickness: 7,
-      }
-    );
+    this.balanceText = this.add.text(250, 2050, `${this.balance}`, {
+      fontSize: "60px",
+      strokeThickness: 7,
+    });
   }
 
   createHUD() {
-    this.add.image(200, 100, "Panel").setDepth(90);
-    this.add.text(190, 75, "1-85", {
-      fontSize: "40px",
-      strokeThickness: 5,
-    }).setDepth(91);
-    this.add.image(90, 100, "ZombieHead").setScale(0.8, 0.8).setDepth(92);
-
-    this.add.image(550, 100, "Panel").setDepth(90);
-    this.chanceToWinText = this.add.text(
-      515,
-      75,
-      `${this.winChanceSequence[0]}`,
-      {
+    this.add
+      .text(190, 40, "Wave length", {
+        fontSize: "45px",
+        strokeThickness: 4,
+        stroke: "#000000",
+      })
+      .setDepth(91)
+      .setOrigin(0.5, 0.5)
+      .setColor("#000000");
+    this.add.image(200, 150, "Panel").setDepth(90);
+    this.add
+      .text(190, 125, "1-85", {
         fontSize: "40px",
         strokeThickness: 5,
-      }
-    ).setDepth(91);
-    this.add.image(440, 100, "Heart").setScale(0.7, 0.7).setDepth(92);
+      })
+      .setDepth(91);
+    this.add.image(90, 150, "ZombieHead").setScale(0.8, 0.8).setDepth(92);
 
-    this.add.image(900, 100, "Panel").setDepth(90);
-    this.totalWinText = this.add.text(890, 75, "160", {
-      fontSize: "40px",
-      strokeThickness: 5,
-    }).setDepth(91);
-    this.add.image(790, 100, "Coin").setScale(0.8, 0.8).setDepth(92);
+    this.add.image(550, 150, "Panel").setDepth(90);
+    this.chanceToWinText = this.add
+      .text(515, 125, `${this.winChanceSequence[0]}`, {
+        fontSize: "40px",
+        strokeThickness: 5,
+      })
+      .setDepth(91);
+    this.add.image(440, 150, "Heart").setScale(0.7, 0.7).setDepth(92);
+
+    this.add.image(900, 150, "Panel").setDepth(90);
+    this.totalWinText = this.add
+      .text(890, 125, "160", {
+        fontSize: "40px",
+        strokeThickness: 5,
+      })
+      .setDepth(91);
+    this.add.image(790, 150, "Coin").setScale(0.8, 0.8).setDepth(92);
   }
 
   createTotalBetText() {
@@ -218,6 +242,14 @@ export default class HelloWorldScene extends Phaser.Scene {
 
       this.towers.push(element.tower);
     });
+
+    for (let i = 0; i < this.towerPlaces.length; i++) {
+      if (this.towerPlaces[i].tower === undefined)
+        this.populatedTowerPlaces[i] = 0;
+      else this.populatedTowerPlaces[i] = 1;
+    }
+
+    console.log(this.populatedTowerPlaces);
   }
 
   finishWave(succesful) {
@@ -308,6 +340,7 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   startWaveButtonClicked() {
+    if (this.numberOfTowers === 0) return;
     this.spawnMinnions(this.ammountOfMinnions);
 
     this.startWaveButton.setAlpha(0);
@@ -317,8 +350,8 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.setMinnionTargetsToTowers();
 
     this.state = 1;
-    this.balance -= this.bet * this.numberOfTowers
-    this.balanceText.text = `${this.balance}`
+    this.balance -= this.bet * this.numberOfTowers;
+    this.balanceText.text = `${this.balance}`;
   }
 
   randomizeAmountOfMinnions() {
@@ -365,13 +398,25 @@ export default class HelloWorldScene extends Phaser.Scene {
     }
   }
 
-resetVariables() {
-  this.towers = [];
-  this.minnions = [];
-  this.minnionCount = [];
-  this.towerPlaces = [];
-  this.state = 0;
-  this.ammountOfMinnions = 10;
-  this.towerCost = 15;
-}
+  resetVariables() {
+    this.towers = [];
+    this.minnions = [];
+    this.minnionCount = [];
+    this.towerPlaces = [];
+    this.state = 0;
+    this.ammountOfMinnions = 10;
+    this.towerCost = 15;
+  }
+
+  loadFont(name, url) {
+    var newFont = new FontFace(name, `url(${url})`);
+    newFont
+      .load()
+      .then(function (loaded) {
+        document.fonts.add(loaded);
+      })
+      .catch(function (error) {
+        return error;
+      });
+  }
 }

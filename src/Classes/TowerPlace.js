@@ -8,16 +8,22 @@ export default class TowerPlace extends Phaser.GameObjects.Image {
       super(scene, x, y, texture);
 
       this.setInteractive();
-
+      this.scene = scene
 
       this.on("pointerup", (pointer, gameobject) => {
-        this.tower = new BaseTower(this.scene, this.x, this.y - 64, "TowerElectric");
-        this.scene.add.existing(this.tower);
-        this.tower.generateAmmoText();
-        scene.numberOfTowers++;
-        scene.totalBetText.text = `${scene.bet*scene.numberOfTowers}`
-        scene.chanceToWinText.text = `${scene.winChanceSequence[scene.numberOfTowers]}`
+        this.addTower()
       })
+
+      
+    }
+
+    addTower() {
+      this.tower = new BaseTower(this.scene, this.x, this.y - 64, "TowerElectric");
+      this.scene.add.existing(this.tower);
+      this.tower.generateAmmoText();
+      this.scene.numberOfTowers++;
+      this.scene.totalBetText.text = `${this.scene.bet*this.scene.numberOfTowers}`
+      this.scene.chanceToWinText.text = `${this.scene.winChanceSequence[this.scene.numberOfTowers]}`
     }
   
     

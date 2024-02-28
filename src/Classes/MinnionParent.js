@@ -11,10 +11,11 @@ export default class MinnionParent extends Phaser.GameObjects.PathFollower {
     this.isDead = false;
     this.isWalking = false;
     this.scene = scene
+    this.coins = 0;
   }
 
   startWalking(iteration) {
-    this.scene.time.delayedCall(iteration * 700, () => {
+    this.scene.time.delayedCall(iteration * 600, () => {
       if(!this.isDead){
 
         this.startFollow({

@@ -8,6 +8,8 @@ export default class BaseTower extends TowerParent {
     super(scene, x, y, texture, 5);
     this.scene = scene;
     scene.input.on("pointerdown", () => {});
+
+    this.graphics = scene.add.graphics();
   }
 
   update(time, delta, target) {
@@ -27,13 +29,28 @@ export default class BaseTower extends TowerParent {
       scene.time.delayedCall(1000 + delay, () => {
         var index = i + iteration * this.amountOfBullets;
         if (target[index] !== undefined) {
-          this.createProjectile(target[index]);
+          // this.createProjectile(target[index]);
 
+          this.shootBeam(target[index])
 
-          this.updateAmmoText();
+          this.killMinnion(target[index])
         }
       });
     }
+  }
+
+  shootBeam(minnion) {
+    this.graphics.lineStyle(10, 0x27AAE1, 1);
+    this.graphics.setDepth(30)
+    this.path = new Phaser.Curves.Path(this.x, this.y - 110);
+    this.path.lineTo(minnion.x, minnion.y);
+    this.path.draw(this.graphics);
+    this.updateAmmoText();
+
+    this.scene.time.delayedCall(100, () => {
+      this.graphics.clear()
+    })
+    
   }
 
   createProjectile(target) {
@@ -74,7 +91,15 @@ export default class BaseTower extends TowerParent {
     projectile.target.isDead = true;
     this.scene.minnionCount.pop();
     projectile.isFinished = true;
-    if(this.scene.minnionCount.length < 1) this.scene.finishWave(true);
+    if (this.scene.minnionCount.length < 1) this.scene.finishWave(true);
+  }
+
+  killMinnion(minnion) {
+    minnion.stopFollow();
+    minnion.destroy();
+    minnion.isDead = true;
+    this.scene.minnionCount.pop();
+    if (this.scene.minnionCount.length < 1) this.scene.finishWave(true);
   }
 
   lerp(start, end, amt) {
