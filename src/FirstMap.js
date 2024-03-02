@@ -4,6 +4,8 @@ import BaseMinnion from "./Classes/BaseMinnion";
 import BaseTower from "./Classes/BaseTower";
 import TowerPlace from "./Classes/TowerPlace";
 
+import TestClass from "./Classes/TestClass";
+
 export default class HelloWorldScene extends Phaser.Scene {
   constructor() {
     super("hello-world");
@@ -69,6 +71,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     16, 16, 17, 18, 19, 20, 30, 50, 60, 100, 160,
   ];
 
+  totalWin = 160;
   totalWinText;
   chanceToWinText;
 
@@ -105,6 +108,11 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   create() {
+
+    this.waveFinished = false;
+
+    console.log(this.aditionalCoinsSequence.length)
+
     this.resetVariables();
 
     this.add.image(0, 0, "map").setOrigin(0, 0);
@@ -130,21 +138,47 @@ export default class HelloWorldScene extends Phaser.Scene {
 
     this.createBalanceText();
 
-    this.resetWaveButton = this.add.image(980, 1600, "ResetTowersButton").setScale(3, 3);
+    this.createResetWaveButton();
+
+    this.createBonusWinText();
+
+    // this.physics.add.image(500, 500, "TowerElectric")
+    
+  }
+
+  update(time, delta) {
+    if (this.towers === undefined || this.towers === null || this.towers.length === 0) return
+    this.towers.forEach((element) => {
+      element.shootMinnionV3();
+    });
+
+    console.log(this.minnions.length)
+
+  }
+
+  createBonusWinText() {
+    this.bounsWinText = this.add
+      .text(540, 1080, "BONUS\nWIN!", {
+        fontSize: "150px",
+        fontFamily: "troika",
+        strokeThickness: 20,
+        stroke: "#000000",
+        align: "center",
+      })
+      .setOrigin(0.5, 0.5)
+      .setAlpha(0);
+  }
+
+  createResetWaveButton() {
+    this.resetWaveButton = this.add
+      .image(980, 1600, "ResetTowersButton")
+      .setScale(3, 3);
     this.resetWaveButton.setInteractive();
     this.resetWaveButton.on("pointerup", () => {
       for (let i = 0; i < this.populatedTowerPlaces.length; i++) {
         if (this.populatedTowerPlaces[i] === 1) this.towerPlaces[i].addTower();
       }
     });
-  }
-
-  update(time, delta) {
-    this.towers.forEach((element) => {
-      element.update(time, delta, this.startWaveButton);
-    });
-
-    console.log(this.minnionCount.length);
   }
 
   createBalanceText() {
@@ -184,7 +218,7 @@ export default class HelloWorldScene extends Phaser.Scene {
 
     this.add.image(900, 150, "Panel").setDepth(90);
     this.totalWinText = this.add
-      .text(890, 125, "160", {
+      .text(890, 125, `${this.totalWin}`, {
         fontSize: "40px",
         strokeThickness: 5,
       })
@@ -219,7 +253,8 @@ export default class HelloWorldScene extends Phaser.Scene {
       this.bet += 10;
       this.betText.text = `${this.bet}`;
       this.totalBetText.text = `${this.bet * this.numberOfTowers}`;
-      this.totalWinText.text = `${this.bet * 16}`;
+      this.totalWin = this.bet * 16;
+      this.totalWinText.text = `${this.totalWin}`;
     });
 
     this.DecreaseBetBtn = this.add
@@ -229,7 +264,8 @@ export default class HelloWorldScene extends Phaser.Scene {
       this.bet -= 10;
       this.betText.text = `${this.bet}`;
       this.totalBetText.text = `${this.bet * this.numberOfTowers}`;
-      this.totalWinText.text = `${this.bet * 16}`;
+      this.totalWin = this.bet * 16;
+      this.totalWinText.text = `${this.totalWin}`;
     });
   }
 
@@ -249,8 +285,6 @@ export default class HelloWorldScene extends Phaser.Scene {
         this.populatedTowerPlaces[i] = 0;
       else this.populatedTowerPlaces[i] = 1;
     }
-
-    console.log(this.populatedTowerPlaces);
   }
 
   finishWave(succesful) {
@@ -261,7 +295,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.numberOfTowers = 0;
 
     if (succesful) {
-      this.balance += this.bet * 16;
+      this.balance += this.totalWin;
       this.balanceText.text = `${this.balance}`;
     }
 
@@ -348,15 +382,37 @@ export default class HelloWorldScene extends Phaser.Scene {
 
     this.populateTowersArray();
 
-    this.setMinnionTargetsToTowers();
+    // this.setMinnionTargetsToTowers();
 
     this.state = 1;
     this.balance -= this.bet * this.numberOfTowers;
     this.balanceText.text = `${this.balance}`;
+
+    this.towers.forEach(element => {
+      element.enableShootingAfterDelay()
+    });
+
+    this.cheackForBonusWin()
+  }
+
+  cheackForBonusWin() {
+    var aditionalGoldPerRound = this.randomizeAditionalGold();
+    if (aditionalGoldPerRound > 0) {
+      this.bounsWinText.setAlpha(1);
+      this.time.delayedCall(1000, () => {
+        this.bounsWinText.setAlpha(0);
+      });
+
+      this.totalWin += aditionalGoldPerRound;
+      this.totalWinText.text = `${this.totalWin}`;
+
+      console.log(`Bonus win: ${aditionalGoldPerRound}` )
+    }
   }
 
   randomizeAmountOfMinnions() {
     this.ammountOfMinnions = Phaser.Math.Between(1, 85);
+
   }
 
   handleInputs() {
@@ -380,10 +436,21 @@ export default class HelloWorldScene extends Phaser.Scene {
     // this.path.draw(this.graphics);
   }
 
+  randomizeAditionalGold() {
+    var randomGoldAmmountIndex = Phaser.Math.Between(
+      0,
+      this.aditionalCoinsSequence.length - 1
+    );
+    var randomGoldAmmountValue =
+      this.aditionalCoinsSequence[randomGoldAmmountIndex];
+
+    return randomGoldAmmountValue * this.bet / 10;
+  }
+
   spawnMinnions(minnionCount) {
     for (let i = 0; i < minnionCount; i++) {
       this.minnionCount.push(1);
-      this.minnion = new BaseMinnion(this, this.path, 756, -64, "Zombie", 8000);
+      this.minnion = new BaseMinnion(this, this.path, 756, -64, "Zombie", 7);
 
       this.add.existing(this.minnion);
       this.minnions.push(this.minnion);
@@ -395,7 +462,7 @@ export default class HelloWorldScene extends Phaser.Scene {
 
   setMinnionTargetsToTowers() {
     for (let i = 0; i < this.towers.length; i++) {
-      this.towers[i].shootMinnion(this.minnions, i, this);
+      this.towers[i].shootMinnionV2(this.minnions, i, this.towers.length);
     }
   }
 

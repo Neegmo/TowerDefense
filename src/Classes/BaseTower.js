@@ -4,6 +4,8 @@ export default class BaseTower extends TowerParent {
   projectile;
   projectiles = [];
   scene;
+
+  canShoot = false;
   constructor(scene, x, y, texture) {
     super(scene, x, y, texture, 5);
     this.scene = scene;
@@ -13,44 +15,92 @@ export default class BaseTower extends TowerParent {
   }
 
   update(time, delta, target) {
-    console.log();
-    this.projectiles.forEach((element) => {
-      if (element === undefined) return;
+    // console.log();
+    // this.projectiles.forEach((element) => {
+    //   if (element === undefined) return;
 
-      this.moveProjectileTwordsTarget(element);
+    //   this.moveProjectileTwordsTarget(element);
 
-      element.lerpStep += delta / 500;
+    //   element.lerpStep += delta / 500;
+    // });
+    this.shootMinnionV3();
+  }
+
+  enableShootingAfterDelay() {
+    this.scene.time.delayedCall(1000, () => {
+      this.canShoot = true;
     });
   }
 
-  shootMinnion(target, iteration, scene) {
+  shootMinnion(target, iteration) {
     for (let i = 0; i < this.amountOfBullets; i++) {
       var delay = i * 1000 + iteration * 3000;
-      scene.time.delayedCall(1000 + delay, () => {
+      this.scene.time.delayedCall(1000 + delay, () => {
         var index = i + iteration * this.amountOfBullets;
         if (target[index] !== undefined) {
-          // this.createProjectile(target[index]);
+          this.shootBeam(target[index]);
 
-          this.shootBeam(target[index])
-
-          this.killMinnion(target[index])
+          this.killMinnion(target[index]);
         }
       });
     }
   }
 
+  shootMinnionV2(target, iteration, towerCount) {
+    for (let i = 0; i < this.amountOfBullets; i++) {
+      var delay = iteration * 500 + i * 1800;
+      if (this.scene.time === undefined) return;
+      this.scene.time.delayedCall(1800 + delay, () => {
+        var index = iteration + i * towerCount;
+        if (target[index] !== undefined) {
+          this.shootBeam(target[index]);
+
+          this.killMinnion(target[index]);
+        }
+      });
+    }
+  }
+
+  shootMinnionV3() {
+    if(this.scene === undefined) return
+    if (this.scene.minnions.length < 1) {
+      this.scene.finishWave(true);
+      return;
+    }
+
+    if (
+      Phaser.Math.Distance.Between(
+        this.x,
+        this.y,
+        this.scene.minnions[0].x,
+        this.scene.minnions[0].y
+      ) < 400 &&
+      this.canShoot &&
+      this.ammo > 0
+    ) {
+      this.shootBeam(this.scene.minnions[0]);
+      this.killMinnion(this.scene.minnions[0]);
+      this.canShoot = false;
+      if (this.scene.time === undefined) return;
+      this.scene.time.delayedCall(700, () => {
+        if (this === undefined) return;
+        this.canShoot = true;
+        if (this.scene.minnionCount.length < 1) this.scene.finishWave(true);
+      });
+    }
+  }
+
   shootBeam(minnion) {
-    this.graphics.lineStyle(10, 0x27AAE1, 1);
-    this.graphics.setDepth(30)
+    this.graphics.lineStyle(10, 0x27aae1, 1);
+    this.graphics.setDepth(30);
     this.path = new Phaser.Curves.Path(this.x, this.y - 110);
     this.path.lineTo(minnion.x, minnion.y);
     this.path.draw(this.graphics);
     this.updateAmmoText();
 
     this.scene.time.delayedCall(100, () => {
-      this.graphics.clear()
-    })
-    
+      this.graphics.clear();
+    });
   }
 
   createProjectile(target) {
@@ -95,11 +145,12 @@ export default class BaseTower extends TowerParent {
   }
 
   killMinnion(minnion) {
-    minnion.stopFollow();
-    minnion.destroy();
-    minnion.isDead = true;
+    this.scene.minnions[0].stopFollow();
+    this.scene.minnions[0].destroy();
+    this.scene.minnions[0].isDead = true;
+    this.scene.minnions.shift();
     this.scene.minnionCount.pop();
-    if (this.scene.minnionCount.length < 1) this.scene.finishWave(true);
+    // if (this.scene.minnionCount.length < 1) this.scene.finishWave(true);
   }
 
   lerp(start, end, amt) {

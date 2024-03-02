@@ -18,9 +18,8 @@ export default class TowerParent extends Phaser.GameObjects.Image {
       scene.totalBetText.text = `${scene.bet*scene.numberOfTowers}`
       scene.chanceToWinText.text = `${scene.winChanceSequence[scene.numberOfTowers]}`
     })
+
   }
-
-
   
 
   generateAmmoText() {
