@@ -11,6 +11,8 @@ export default class TowerParent extends Phaser.GameObjects.Image {
 
     this.setInteractive();
 
+    this.setDepth(10)
+
     this.on("pointerup", () => {
       this.destroy();
       this.ammoText.destroy();
@@ -28,10 +30,13 @@ export default class TowerParent extends Phaser.GameObjects.Image {
       this.y + 15,
       `${this.ammo}`,
       {
-        fontSize: "50px",
+        fontSize: "45px",
+        fontFamily: "troika",
         strokeThickness: 4,
+        stroke: "#000000",
       }
     );
+    this.ammoText.setDepth(11)
   }
 
   updateAmmoText() {

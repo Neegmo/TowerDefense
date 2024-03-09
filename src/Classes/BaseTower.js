@@ -62,7 +62,7 @@ export default class BaseTower extends TowerParent {
   }
 
   shootMinnionV3() {
-    if(this.scene === undefined) return
+    if (this.scene === undefined) return;
     if (this.scene.minnions.length < 1) {
       this.scene.finishWave(true);
       return;
@@ -145,6 +145,16 @@ export default class BaseTower extends TowerParent {
   }
 
   killMinnion(minnion) {
+    var deadAnim = this.scene.add.sprite(
+      this.scene.minnions[0].x,
+      this.scene.minnions[0].y,
+      "DeadAnimation"
+    );
+    deadAnim.setDepth(1);
+    deadAnim.play("ZombieDead");
+    deadAnim.on("animationcomplete", () => {
+      deadAnim.destroy();
+    });
     this.scene.minnions[0].stopFollow();
     this.scene.minnions[0].destroy();
     this.scene.minnions[0].isDead = true;

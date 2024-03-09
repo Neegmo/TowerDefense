@@ -12,6 +12,9 @@ export default class MinnionParent extends Phaser.GameObjects.PathFollower {
     this.isWalking = false;
     this.scene = scene;
     this.coins = 0;
+
+    this.setDepth(5);
+    
   }
 
   startWalking(iteration) {

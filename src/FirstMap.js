@@ -100,6 +100,50 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.load.image("Heart", "Heart.png");
     this.load.image("ResetTowersButton", "ResetTowersButton.png");
 
+    this.load.spritesheet("DeadAnimation", "DeadAnimation.png", {
+      frameWidth: 164,
+      frameHeight: 155,
+    });
+
+    this.load.spritesheet(
+      "ZombieWalkingForwardSpritesheet",
+      "ZombieWalkingForwardSpritesheet.png",
+      {
+        frameWidth: 160,
+        frameHeight: 162,
+      }
+    );
+
+    this.load.spritesheet("WinSpritesheet1", "WinSpritesheet1.png", {
+      frameWidth: 805,
+      frameHeight: 572,
+    });
+
+    this.load.spritesheet("WinSpritesheet2", "WinSpritesheet2.png", {
+      frameWidth: 805,
+      frameHeight: 572,
+    });
+
+    this.load.spritesheet("WinSpritesheet3", "WinSpritesheet3.png", {
+      frameWidth: 805,
+      frameHeight: 572,
+    });
+
+    this.load.spritesheet("WinSpritesheet4", "WinSpritesheet4.png", {
+      frameWidth: 805,
+      frameHeight: 572,
+    });
+
+    this.load.spritesheet("LoseSpritesheet1", "LoseSpritesheet1.png", {
+      frameWidth: 662,
+      frameHeight: 770,
+    });
+
+    this.load.spritesheet("LoseSpritesheet2", "LoseSpritesheet2.png", {
+      frameWidth: 662,
+      frameHeight: 770,
+    });
+
     // this.load.atlas(
     //   "ATowerElectric",
     //   "TowerElectricAtlas.png",
@@ -108,10 +152,9 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   create() {
-
     this.waveFinished = false;
 
-    console.log(this.aditionalCoinsSequence.length)
+    console.log(this.aditionalCoinsSequence.length);
 
     this.resetVariables();
 
@@ -143,17 +186,73 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.createBonusWinText();
 
     // this.physics.add.image(500, 500, "TowerElectric")
-    
+
+    this.anims.create({
+      key: "ZombieDead",
+      frames: "DeadAnimation",
+      repeat: 0,
+    });
+
+    this.anims.create({
+      key: "ZombieWalkingForward",
+      frames: "ZombieWalkingForwardSpritesheet",
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "WinAnimation",
+      frames: [
+        ...this.anims.generateFrameNames("WinSpritesheet1", {
+          start: 0,
+          end: 19,
+        }),
+        ...this.anims.generateFrameNames("WinSpritesheet2", {
+          start: 0,
+          end: 19,
+        }),
+        ...this.anims.generateFrameNames("WinSpritesheet3", {
+          start: 0,
+          end: 19,
+        }),
+        ...this.anims.generateFrameNames("WinSpritesheet4", {
+          start: 0,
+          end: 19,
+        }),
+      ],
+      repeat: 0,
+    });
+
+    this.anims.create({
+      key: "LoseAnimation",
+      frames: [
+        ...this.anims.generateFrameNames("LoseSpritesheet1", {
+          start: 0,
+          end: 24,
+        }),
+        ...this.anims.generateFrameNames("LoseSpritesheet2", {
+          start: 0,
+          end: 24,
+        }),
+      ],
+      repeat: 0,
+    });
+
+    // this.add.sprite(540, 900, "WinSpritesheet1").setScale(1.7, 1.7).play("WinAnimation")
+    // this.add.sprite(540, 800, "LoseSpritesheet1").setScale(1.7, 1.7).play("LoseAnimation")
   }
 
   update(time, delta) {
-    if (this.towers === undefined || this.towers === null || this.towers.length === 0) return
+    if (
+      this.towers === undefined ||
+      this.towers === null ||
+      this.towers.length === 0
+    )
+      return;
     this.towers.forEach((element) => {
       element.shootMinnionV3();
     });
 
-    console.log(this.minnions.length)
-
+    console.log(this.minnions.length);
   }
 
   createBonusWinText() {
@@ -166,7 +265,8 @@ export default class HelloWorldScene extends Phaser.Scene {
         align: "center",
       })
       .setOrigin(0.5, 0.5)
-      .setAlpha(0);
+      .setAlpha(0)
+      .setDepth(110);
   }
 
   createResetWaveButton() {
@@ -176,7 +276,11 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.resetWaveButton.setInteractive();
     this.resetWaveButton.on("pointerup", () => {
       for (let i = 0; i < this.populatedTowerPlaces.length; i++) {
-        if (this.populatedTowerPlaces[i] === 1) this.towerPlaces[i].addTower();
+        if (
+          this.populatedTowerPlaces[i] === 1 &&
+          this.towerPlaces[i].tower === undefined
+        )
+          this.towerPlaces[i].addTower();
       }
     });
   }
@@ -184,25 +288,30 @@ export default class HelloWorldScene extends Phaser.Scene {
   createBalanceText() {
     this.balanceText = this.add.text(250, 2050, `${this.balance}`, {
       fontSize: "60px",
-      strokeThickness: 7,
+      fontFamily: "troika",
+      strokeThickness: 4,
+      stroke: "#000000",
     });
   }
 
   createHUD() {
-    this.add
-      .text(190, 40, "Wave length", {
-        fontSize: "45px",
-        strokeThickness: 4,
-        stroke: "#000000",
-      })
-      .setDepth(91)
-      .setOrigin(0.5, 0.5)
-      .setColor("#000000");
+    // this.add
+    //   .text(190, 40, "Wave length", {
+    //     fontSize: "45px",
+    //     fontFamily: "troika",
+    //     strokeThickness: 4,
+    //     stroke: "#000000",
+    //   })
+    //   .setDepth(91)
+    //   .setOrigin(0.5, 0.5)
+    //   .setColor("#000000");
     this.add.image(200, 150, "Panel").setDepth(90);
     this.add
       .text(190, 125, "1-85", {
         fontSize: "40px",
-        strokeThickness: 5,
+        fontFamily: "troika",
+        strokeThickness: 4,
+        stroke: "#000000",
       })
       .setDepth(91);
     this.add.image(90, 150, "ZombieHead").setScale(0.8, 0.8).setDepth(92);
@@ -211,7 +320,9 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.chanceToWinText = this.add
       .text(515, 125, `${this.winChanceSequence[0]}`, {
         fontSize: "40px",
-        strokeThickness: 5,
+        fontFamily: "troika",
+        strokeThickness: 4,
+        stroke: "#000000",
       })
       .setDepth(91);
     this.add.image(440, 150, "Heart").setScale(0.7, 0.7).setDepth(92);
@@ -220,7 +331,9 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.totalWinText = this.add
       .text(890, 125, `${this.totalWin}`, {
         fontSize: "40px",
-        strokeThickness: 5,
+        fontFamily: "troika",
+        strokeThickness: 4,
+        stroke: "#000000",
       })
       .setDepth(91);
     this.add.image(790, 150, "Coin").setScale(0.8, 0.8).setDepth(92);
@@ -233,7 +346,9 @@ export default class HelloWorldScene extends Phaser.Scene {
       `${this.bet * this.numberOfTowers}`,
       {
         fontSize: "60px",
-        strokeThickness: 7,
+        fontFamily: "troika",
+        strokeThickness: 4,
+        stroke: "#000000",
       }
     );
   }
@@ -241,7 +356,9 @@ export default class HelloWorldScene extends Phaser.Scene {
   createBetText() {
     this.betText = this.add.text(285, 1885, `${this.bet}`, {
       fontSize: "60px",
-      strokeThickness: 7,
+      fontFamily: "troika",
+      strokeThickness: 4,
+      stroke: "#000000",
     });
   }
 
@@ -288,18 +405,32 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   finishWave(succesful) {
+    if (this.state === 0) return;
     this.state = 0;
-    this.startWaveButton.setAlpha(1);
-    this.resetMinnionArray();
-    this.resetTowerArray();
-    this.numberOfTowers = 0;
 
     if (succesful) {
+      this.add
+        .sprite(540, 900, "WinSpritesheet1")
+        .setScale(1.7, 1.7)
+        .setDepth(20)
+        .play("WinAnimation");
       this.balance += this.totalWin;
       this.balanceText.text = `${this.balance}`;
+    } else {
+      this.add
+        .sprite(540, 800, "LoseSpritesheet1")
+        .setScale(1.7, 1.7)
+        .setDepth(20)
+        .play("LoseAnimation");
     }
 
-    this.scene.restart();
+    this.time.delayedCall(3000, () => {
+      this.startWaveButton.setAlpha(1);
+      this.resetMinnionArray();
+      this.resetTowerArray();
+      this.numberOfTowers = 0;
+      this.scene.restart();
+    });
   }
 
   resetMinnionArray() {
@@ -388,11 +519,11 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.balance -= this.bet * this.numberOfTowers;
     this.balanceText.text = `${this.balance}`;
 
-    this.towers.forEach(element => {
-      element.enableShootingAfterDelay()
+    this.towers.forEach((element) => {
+      element.enableShootingAfterDelay();
     });
 
-    this.cheackForBonusWin()
+    this.cheackForBonusWin();
   }
 
   cheackForBonusWin() {
@@ -406,13 +537,12 @@ export default class HelloWorldScene extends Phaser.Scene {
       this.totalWin += aditionalGoldPerRound;
       this.totalWinText.text = `${this.totalWin}`;
 
-      console.log(`Bonus win: ${aditionalGoldPerRound}` )
+      console.log(`Bonus win: ${aditionalGoldPerRound}`);
     }
   }
 
   randomizeAmountOfMinnions() {
     this.ammountOfMinnions = Phaser.Math.Between(1, 85);
-
   }
 
   handleInputs() {
@@ -444,7 +574,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     var randomGoldAmmountValue =
       this.aditionalCoinsSequence[randomGoldAmmountIndex];
 
-    return randomGoldAmmountValue * this.bet / 10;
+    return (randomGoldAmmountValue * this.bet) / 10;
   }
 
   spawnMinnions(minnionCount) {
