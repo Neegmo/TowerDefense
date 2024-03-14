@@ -42,5 +42,9 @@ export default class TowerParent extends Phaser.GameObjects.Image {
   updateAmmoText() {
     this.ammo--;
     this.ammoText.text = `${this.ammo}`;
+
+    if(this.ammo <= 0) {
+      this.setTexture("DrainedTower")
+    }
   }
 }

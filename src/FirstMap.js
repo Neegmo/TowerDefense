@@ -99,6 +99,12 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.load.image("Coin", "Coin.png");
     this.load.image("Heart", "Heart.png");
     this.load.image("ResetTowersButton", "ResetTowersButton.png");
+    this.load.image("Lighter", "Lighter.png")
+    this.load.image("ChanceToWin", "ChanceToWin.png")
+    this.load.image("Loot", "Loot.png")
+    this.load.image("WaveLength", "WaveLength.png")
+    this.load.image("FreeLootSign", "FreeLootSign.png")
+    this.load.image("DrainedTower", "DrainedTower.png")
 
     this.load.spritesheet("DeadAnimation", "DeadAnimation.png", {
       frameWidth: 164,
@@ -143,12 +149,6 @@ export default class HelloWorldScene extends Phaser.Scene {
       frameWidth: 662,
       frameHeight: 770,
     });
-
-    // this.load.atlas(
-    //   "ATowerElectric",
-    //   "TowerElectricAtlas.png",
-    //   "TowerElectricAtlas.json"
-    // );
   }
 
   create() {
@@ -187,6 +187,27 @@ export default class HelloWorldScene extends Phaser.Scene {
 
     // this.physics.add.image(500, 500, "TowerElectric")
 
+    this.createAnimations()
+
+    // this.add.sprite(540, 900, "WinSpritesheet1").setScale(1.7, 1.7).play("WinAnimation")
+    // this.add.sprite(540, 800, "LoseSpritesheet1").setScale(1.7, 1.7).play("LoseAnimation")
+  }
+
+  update(time, delta) {
+    if (
+      this.towers === undefined ||
+      this.towers === null ||
+      this.towers.length === 0
+    )
+      return;
+    this.towers.forEach((element) => {
+      element.shootMinnionV3();
+    });
+
+    console.log(this.minnions.length);
+  }
+
+  createAnimations() {
     this.anims.create({
       key: "ZombieDead",
       frames: "DeadAnimation",
@@ -236,36 +257,20 @@ export default class HelloWorldScene extends Phaser.Scene {
       ],
       repeat: 0,
     });
-
-    // this.add.sprite(540, 900, "WinSpritesheet1").setScale(1.7, 1.7).play("WinAnimation")
-    // this.add.sprite(540, 800, "LoseSpritesheet1").setScale(1.7, 1.7).play("LoseAnimation")
-  }
-
-  update(time, delta) {
-    if (
-      this.towers === undefined ||
-      this.towers === null ||
-      this.towers.length === 0
-    )
-      return;
-    this.towers.forEach((element) => {
-      element.shootMinnionV3();
-    });
-
-    console.log(this.minnions.length);
   }
 
   createBonusWinText() {
-    this.bounsWinText = this.add
-      .text(540, 1080, "BONUS\nWIN!", {
-        fontSize: "150px",
+    this.bonusWinSign = this.add.image(540, 950, "FreeLootSign").setAlpha(0).setDepth(20)
+    this.bonusWinText = this.add
+      .text(570, 1020, "", {
+        fontSize: "130px",
         fontFamily: "troika",
         strokeThickness: 20,
         stroke: "#000000",
         align: "center",
       })
       .setOrigin(0.5, 0.5)
-      .setAlpha(0)
+      .setColor("#fcca21")
       .setDepth(110);
   }
 
@@ -295,48 +300,41 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   createHUD() {
-    // this.add
-    //   .text(190, 40, "Wave length", {
-    //     fontSize: "45px",
-    //     fontFamily: "troika",
-    //     strokeThickness: 4,
-    //     stroke: "#000000",
-    //   })
-    //   .setDepth(91)
-    //   .setOrigin(0.5, 0.5)
-    //   .setColor("#000000");
-    this.add.image(200, 150, "Panel").setDepth(90);
+    this.add.image(190, 150, "WaveLength").setScale(1.1, 1.1).setDepth(90);
     this.add
-      .text(190, 125, "1-85", {
+      .text(205, 150, "1-85", {
         fontSize: "40px",
         fontFamily: "troika",
         strokeThickness: 4,
         stroke: "#000000",
       })
+      .setOrigin(0.5, 0.5)
       .setDepth(91);
-    this.add.image(90, 150, "ZombieHead").setScale(0.8, 0.8).setDepth(92);
+    // this.add.image(90, 150, "ZombieHead").setScale(0.8, 0.8).setDepth(92);
 
-    this.add.image(550, 150, "Panel").setDepth(90);
+    this.add.image(540, 150, "ChanceToWin").setScale(1.1, 1.1).setDepth(90);
     this.chanceToWinText = this.add
-      .text(515, 125, `${this.winChanceSequence[0]}`, {
+      .text(575, 155, `${this.winChanceSequence[0]}`, {
         fontSize: "40px",
         fontFamily: "troika",
         strokeThickness: 4,
         stroke: "#000000",
       })
+      .setOrigin(0.5, 0.5)
       .setDepth(91);
-    this.add.image(440, 150, "Heart").setScale(0.7, 0.7).setDepth(92);
+    // this.add.image(440, 150, "Heart").setScale(0.7, 0.7).setDepth(92);
 
-    this.add.image(900, 150, "Panel").setDepth(90);
+    this.add.image(890, 150, "Loot").setScale(1.1, 1.1).setDepth(90);
     this.totalWinText = this.add
-      .text(890, 125, `${this.totalWin}`, {
+      .text(930, 155, `${this.totalWin}`, {
         fontSize: "40px",
         fontFamily: "troika",
         strokeThickness: 4,
         stroke: "#000000",
       })
+      .setOrigin(0.5, 0.5)
       .setDepth(91);
-    this.add.image(790, 150, "Coin").setScale(0.8, 0.8).setDepth(92);
+    // this.add.image(790, 150, "Coin").setScale(0.8, 0.8).setDepth(92);
   }
 
   createTotalBetText() {
@@ -409,19 +407,25 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.state = 0;
 
     if (succesful) {
-      this.add
-        .sprite(540, 900, "WinSpritesheet1")
-        .setScale(1.7, 1.7)
-        .setDepth(20)
-        .play("WinAnimation");
-      this.balance += this.totalWin;
-      this.balanceText.text = `${this.balance}`;
+      this.time.delayedCall(1000, () => {
+
+        this.add
+          .sprite(540, 900, "WinSpritesheet1")
+          .setScale(1.7, 1.7)
+          .setDepth(20)
+          .play("WinAnimation");
+        this.balance += this.totalWin;
+        this.balanceText.text = `${this.balance}`;
+      })
     } else {
-      this.add
-        .sprite(540, 800, "LoseSpritesheet1")
-        .setScale(1.7, 1.7)
-        .setDepth(20)
-        .play("LoseAnimation");
+      this.time.delayedCall(500, () => {
+
+        this.add
+          .sprite(540, 800, "LoseSpritesheet1")
+          .setScale(1.7, 1.7)
+          .setDepth(20)
+          .play("LoseAnimation");
+      })
     }
 
     this.time.delayedCall(3000, () => {
@@ -529,9 +533,11 @@ export default class HelloWorldScene extends Phaser.Scene {
   cheackForBonusWin() {
     var aditionalGoldPerRound = this.randomizeAditionalGold();
     if (aditionalGoldPerRound > 0) {
-      this.bounsWinText.setAlpha(1);
-      this.time.delayedCall(1000, () => {
-        this.bounsWinText.setAlpha(0);
+      this.bonusWinSign.setAlpha(1)
+      this.bonusWinText.text = `${aditionalGoldPerRound}`
+      this.time.delayedCall(1500, () => {
+        this.bonusWinSign.setAlpha(0);
+        this.bonusWinText.text = ""
       });
 
       this.totalWin += aditionalGoldPerRound;

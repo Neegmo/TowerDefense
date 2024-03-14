@@ -12,6 +12,12 @@ export default class BaseTower extends TowerParent {
     scene.input.on("pointerdown", () => {});
 
     this.graphics = scene.add.graphics();
+
+    this.Lighter = this.scene.add
+      .image(this.x + 3, this.y - 110, "Lighter")
+      .setDepth(15)
+      .setScale(1.5, 1.5)
+      .setAlpha(0);
   }
 
   update(time, delta, target) {
@@ -92,13 +98,15 @@ export default class BaseTower extends TowerParent {
 
   shootBeam(minnion) {
     this.graphics.lineStyle(10, 0x27aae1, 1);
-    this.graphics.setDepth(30);
+    this.graphics.setDepth(14);
     this.path = new Phaser.Curves.Path(this.x, this.y - 110);
     this.path.lineTo(minnion.x, minnion.y);
     this.path.draw(this.graphics);
+    this.Lighter.setAlpha(1)
     this.updateAmmoText();
 
     this.scene.time.delayedCall(100, () => {
+      this.Lighter.setAlpha(0)
       this.graphics.clear();
     });
   }
