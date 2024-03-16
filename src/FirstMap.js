@@ -62,13 +62,14 @@ export default class HelloWorldScene extends Phaser.Scene {
   ];
 
   aditionalCoinsSequence = [
-    0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-    3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-    3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5,
-    5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6,
-    6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8,
-    8, 8, 8, 8, 8, 8, 9, 10, 12, 13, 14, 15, 15, 15, 15, 15, 15, 15, 16, 16, 16,
-    16, 16, 17, 18, 19, 20, 30, 50, 60, 100, 160,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+    5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+    10, 10, 10, 10, 10, 10, 15, 15, 15, 20, 20, 20, 20, 30, 40, 50, 70, 100,
+    100, 100, 100, 100, 100, 100, 100, 150, 200, 500, 500,
   ];
 
   totalWin = 160;
@@ -99,12 +100,12 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.load.image("Coin", "Coin.png");
     this.load.image("Heart", "Heart.png");
     this.load.image("ResetTowersButton", "ResetTowersButton.png");
-    this.load.image("Lighter", "Lighter.png")
-    this.load.image("ChanceToWin", "ChanceToWin.png")
-    this.load.image("Loot", "Loot.png")
-    this.load.image("WaveLength", "WaveLength.png")
-    this.load.image("FreeLootSign", "FreeLootSign.png")
-    this.load.image("DrainedTower", "DrainedTower.png")
+    this.load.image("Lighter", "Lighter.png");
+    this.load.image("ChanceToWin", "ChanceToWin.png");
+    this.load.image("Loot", "Loot.png");
+    this.load.image("WaveLength", "WaveLength.png");
+    this.load.image("FreeLootSign", "FreeLootSign.png");
+    this.load.image("DrainedTower", "DrainedTower.png");
 
     this.load.spritesheet("DeadAnimation", "DeadAnimation.png", {
       frameWidth: 164,
@@ -187,7 +188,7 @@ export default class HelloWorldScene extends Phaser.Scene {
 
     // this.physics.add.image(500, 500, "TowerElectric")
 
-    this.createAnimations()
+    this.createAnimations();
 
     // this.add.sprite(540, 900, "WinSpritesheet1").setScale(1.7, 1.7).play("WinAnimation")
     // this.add.sprite(540, 800, "LoseSpritesheet1").setScale(1.7, 1.7).play("LoseAnimation")
@@ -260,7 +261,10 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   createBonusWinText() {
-    this.bonusWinSign = this.add.image(540, 950, "FreeLootSign").setAlpha(0).setDepth(20)
+    this.bonusWinSign = this.add
+      .image(540, 950, "FreeLootSign")
+      .setAlpha(0)
+      .setDepth(20);
     this.bonusWinText = this.add
       .text(570, 1020, "", {
         fontSize: "130px",
@@ -291,12 +295,14 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   createBalanceText() {
-    this.balanceText = this.add.text(250, 2050, `${this.balance}`, {
-      fontSize: "60px",
-      fontFamily: "troika",
-      strokeThickness: 4,
-      stroke: "#000000",
-    });
+    this.balanceText = this.add
+      .text(320, 2080, `${this.balance}`, {
+        fontSize: "60px",
+        fontFamily: "troika",
+        strokeThickness: 4,
+        stroke: "#000000",
+      })
+      .setOrigin(0.5, 0.5);
   }
 
   createHUD() {
@@ -338,26 +344,25 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   createTotalBetText() {
-    this.totalBetText = this.add.text(
-      750,
-      1885,
-      `${this.bet * this.numberOfTowers}`,
-      {
+    this.totalBetText = this.add
+      .text(780, 1920, `${this.bet * this.numberOfTowers}`, {
         fontSize: "60px",
         fontFamily: "troika",
         strokeThickness: 4,
         stroke: "#000000",
-      }
-    );
+      })
+      .setOrigin(0.5, 0.5);
   }
 
   createBetText() {
-    this.betText = this.add.text(285, 1885, `${this.bet}`, {
-      fontSize: "60px",
-      fontFamily: "troika",
-      strokeThickness: 4,
-      stroke: "#000000",
-    });
+    this.betText = this.add
+      .text(320, 1920, `${this.bet}`, {
+        fontSize: "60px",
+        fontFamily: "troika",
+        strokeThickness: 4,
+        stroke: "#000000",
+      })
+      .setOrigin(0.5, 0.5);
   }
 
   createChangeBetButtons() {
@@ -408,7 +413,6 @@ export default class HelloWorldScene extends Phaser.Scene {
 
     if (succesful) {
       this.time.delayedCall(1000, () => {
-
         this.add
           .sprite(540, 900, "WinSpritesheet1")
           .setScale(1.7, 1.7)
@@ -416,16 +420,15 @@ export default class HelloWorldScene extends Phaser.Scene {
           .play("WinAnimation");
         this.balance += this.totalWin;
         this.balanceText.text = `${this.balance}`;
-      })
+      });
     } else {
       this.time.delayedCall(500, () => {
-
         this.add
           .sprite(540, 800, "LoseSpritesheet1")
           .setScale(1.7, 1.7)
           .setDepth(20)
           .play("LoseAnimation");
-      })
+      });
     }
 
     this.time.delayedCall(3000, () => {
@@ -533,11 +536,11 @@ export default class HelloWorldScene extends Phaser.Scene {
   cheackForBonusWin() {
     var aditionalGoldPerRound = this.randomizeAditionalGold();
     if (aditionalGoldPerRound > 0) {
-      this.bonusWinSign.setAlpha(1)
-      this.bonusWinText.text = `${aditionalGoldPerRound}`
+      this.bonusWinSign.setAlpha(1);
+      this.bonusWinText.text = `${aditionalGoldPerRound}`;
       this.time.delayedCall(1500, () => {
         this.bonusWinSign.setAlpha(0);
-        this.bonusWinText.text = ""
+        this.bonusWinText.text = "";
       });
 
       this.totalWin += aditionalGoldPerRound;
@@ -610,6 +613,8 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.state = 0;
     this.ammountOfMinnions = 10;
     this.towerCost = 15;
+    this.totalWin = 160;
+    this.totalWinText = `${this.totalWin}`;
   }
 
   loadFont(name, url) {
